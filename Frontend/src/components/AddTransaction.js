@@ -5,7 +5,40 @@ const AddTransaction = () => { // Ensure function is defined before export
   const [text, setText] = useState("");
   const [amount, setAmount] = useState(0);
   const [categories, setCategories] = useState([]);
+  
+  //category option with dynamically
   const [selectedCategory, setSelectedCategory] = useState("");
+  const handleCategoryChange = (event) => {
+    setSelectedCategory(event.target.value);
+    console.log("Selected Category:", event.target.value);
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedCategory) {
+      console.log("No category selected!");
+      return;
+    }
+  
+    try {
+      const response = await fetch("http://localhost:5000/api/addItem", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ category: selectedCategory }),
+      });
+  
+      const data = await response.json();
+      console.log("Response:", data);
+    } catch (error) {
+      console.error("Error submitting category:", error);
+    }
+  };
+
+  
+
+
+
 
   const { addTransaction } = useContext(GlobalContext);
 
@@ -31,6 +64,8 @@ const AddTransaction = () => { // Ensure function is defined before export
   
   const onSubmit = (e) => {
     e.preventDefault();
+
+    console.log("Final selected category before submission:", selectedCategory);
 
     if (!text || !amount) {
       alert("Please provide valid text and amount");
@@ -65,8 +100,16 @@ const AddTransaction = () => { // Ensure function is defined before export
         </div>
         <div className="form-control">
           <label htmlFor="category">Category</label>
-          <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-            <option value="" disabled>Select a category</option>
+
+          <select
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              console.log("Dropdown selected category:", e.target.value); //Log selected value 
+            }}
+            >  
+          
+          <option value="" disabled>Select a category</option>
             {categories.length > 0 ? (
               categories.map((category) => (
                 <option key={category._id} value={category.name}>{category.name}</option>
